@@ -10,7 +10,7 @@ on:
 
 jobs:
   test_django_job:
-    uses: codingforentrepreneurs/Django-Kubernetes/.github/workflows/test-django.yaml@main
+    uses: LuckyRathod/Kubernetes-GithubActions/.github/workflows/test-django.yaml@main
   build:
     runs-on: ubuntu-latest
     needs: [test_django_job]
@@ -18,7 +18,7 @@ jobs:
       CLUSTER_NAME: django-k8s
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2  
       - name: Insall doctl
         uses: digitalocean/action-doctl@v2
         with:
@@ -27,18 +27,21 @@ jobs:
         run: doctl registry login --expiry-seconds 1200
       - name: Build container image
         working-directory: ./web
+
+        ### v1 in line 35 is replace with Github run id -- GITHUB_SHA::7 -- Will give first 7 characters  
         run: |
           docker build -f Dockerfile \
-            -t registry.digitalocean.com/cfe-k8s/django-k8s-web:latest \
-            -t registry.digitalocean.com/cfe-k8s/django-k8s-web:${GITHUB_SHA::7}-${GITHUB_RUN_ID::5} \
+            -t registry.digitalocean.com/container-registry-lucky/django-k8s-web:latest \
+            -t registry.digitalocean.com/container-registry-lucky/django-k8s-web:${GITHUB_SHA::7}-${GITHUB_RUN_ID::5} \
             .
       - name: Push image
         run: |
-          docker push registry.digitalocean.com/cfe-k8s/django-k8s-web --all-tags
+          docker push registry.digitalocean.com/container-registry-lucky/django-k8s-web --all-tags
       - name: K8s cluster kubeconfig file with/ short-lived creds
         run: |
           doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ env.CLUSTER_NAME }}
       - name: Update deployment secrets
+        ## Will create new file - All env variables will be there in that file
         run: |
           cat << EOF >> web/.env.prod
           AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -58,7 +61,7 @@ jobs:
           kubectl create secret generic django-k8s-web-prod-env --from-env-file=web/.env.prod
       - name: Update Deployment image
         run: |
-          kubectl set image deployment/django-k8s-web-deployment django-k8s-web=registry.digitalocean.com/cfe-k8s/django-k8s-web:${GITHUB_SHA::7}-${GITHUB_RUN_ID::5}
+          kubectl set image deployment/django-k8s-web-deployment django-k8s-web=registry.digitalocean.com/container-registry-lucky/django-k8s-web:${GITHUB_SHA::7}-${GITHUB_RUN_ID::5}
       - name: Wait for rollout to finish
         run: |
           kubectl rollout status deployment/django-k8s-web-deployment

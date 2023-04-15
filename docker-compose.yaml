@@ -6,7 +6,9 @@ services:
   #   build:
   #     context: ./web
   #     dockerfile: Dockerfile
+  #   #### Image name
   #   image: django-k8s:v1
+  #   #### It is similar to docker build -t django-k8s:v1 -f DockerFile ./web
   #   environment:
   #     - PORT=8020
   #   env_file:
@@ -22,6 +24,8 @@ services:
     command: -p 5434
     env_file:
       - web/.env
+
+    ### When we use Expose . Other services can communicate with this service by port no which is written in expose
     expose:
       - 5434
     ports:
@@ -33,6 +37,8 @@ services:
     restart: always
     expose:
       - 6388
+
+    ## With help of PORTS - Local system can also communicate 
     ports:
       - "6388:6388"
     volumes:
@@ -44,4 +50,4 @@ volumes:
   # staticfiles:
   #     external: true
   postgres_data:
-  redis_data: 
+  redis_data:  

@@ -8,14 +8,14 @@ python manage.py test
 
 ```
 docker build -f Dockerfile \
-  -t registry.digitalocean.com/cfe-k8s/django-k8s-web:latest 
-  -t registry.digitalocean.com/cfe-k8s/django-k8s-web:v1 
+  -t registry.digitalocean.com/container-registry-lucky/django-k8s-web:latest 
+  -t registry.digitalocean.com/container-registry-lucky/django-k8s-web:v1 
 ```
 
 3. Push Container with 2 tags: latest and random
 
 ```
-docker push registry.digitalocean.com/cfe-k8s/django-k8s-web --all-tags
+docker push registry.digitalocean.com/container-registry-lucky/django-k8s-web --all-tags
 ```
 
 4. Update secrets (if needed)
@@ -71,20 +71,20 @@ kubectl apply -f k8s/apps/django-k8s-web.yaml
 ```
 
 
-6. Roll Update:
+6. Roll Update - Wait for rollout to finish: 
 ```
 kubectl rollout status deployment/django-k8s-web-deployment
 ```
 7. Migrate database
 
-Get a single pod (either method works)
+Get a single pod (either method works) - Below command will give you one single POD Name
 
 ```
 export SINGLE_POD_NAME=$(kubectl get pod -l app=django-k8s-web-deployment -o jsonpath="{.items[0].metadata.name}")
 ```
 or 
 ```
-export SINGLE_POD_NAME=$(kubectl get pod -l=app=django-k8s-web-deployment -o NAME | tail -n 1)
+export SINGLE_POD_NAME=$(kubectl get pod -l=app=django-k8s-web-deployment -o NAME | tail -n 1) 
 ```
 
 Then run `migrate.sh` 

@@ -1,5 +1,5 @@
-name: Django CI & Postgres Testing
-### Github Actions
+name: Django CI & Postgres Test
+
 on:
   workflow_call:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
       POSTGRES_HOST: localhost
       POSTGRES_PORT: 5432
       DB_IGNORE_SSL: "true"
-    services:git
+    services:
       postgres_main:
         image: postgres:15
         env:

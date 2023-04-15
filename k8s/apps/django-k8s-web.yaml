@@ -16,18 +16,18 @@ spec:
     spec:
       containers:
       - name: django-k8s-web
-        image: registry.digitalocean.com/cfe-k8s/django-k8s-web:latest
+        image: registry.digitalocean.com/container-registry-lucky/django-k8s-web:latest
         imagePullPolicy: Always
         envFrom:
           - secretRef:
               name: django-k8s-web-prod-env
         env:
           - name: PORT
-            value: "8002"
+            value: "8003"
         ports:
-        - containerPort: 8002
+        - containerPort: 8003
       imagePullSecrets:
-        - name: cfe-k8s   
+        - name: container-registry-lucky   
 
 
 ---
@@ -41,6 +41,6 @@ spec:
     - name: http
       protocol: TCP
       port: 80
-      targetPort: 8002
+      targetPort: 8003
   selector:
     app: django-k8s-web-deployment
